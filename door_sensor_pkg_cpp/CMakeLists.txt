@@ -15,6 +15,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(ros2_time REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
@@ -28,15 +29,15 @@ rosidl_generate_interfaces(door_sensor_pkg_cpp
 include_directories(include)
 
 add_executable(agv_publisher src/AGV_Publisher.cpp)
-ament_target_dependencies(agv_publisher rclcpp std_msgs)
+ament_target_dependencies(agv_publisher rclcpp std_msgs ros2_time)
 rosidl_target_interfaces(agv_publisher door_sensor_pkg_cpp "rosidl_typesupport_cpp")
 
 add_executable(rmf_agv_subscriber src/RMF_AGV_Subscriber.cpp)
-ament_target_dependencies(rmf_agv_subscriber rclcpp std_msgs)
+ament_target_dependencies(rmf_agv_subscriber rclcpp std_msgs ros2_time)
 rosidl_target_interfaces(rmf_agv_subscriber door_sensor_pkg_cpp "rosidl_typesupport_cpp")
 
 add_executable(sensor_status_pub src/sensor_status_pub.cpp)
-ament_target_dependencies(sensor_status_pub rclcpp std_msgs)
+ament_target_dependencies(sensor_status_pub rclcpp std_msgs ros2_time)
 
 install(TARGETS
   agv_publisher
