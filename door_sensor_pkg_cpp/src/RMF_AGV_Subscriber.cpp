@@ -41,6 +41,7 @@ private:
     if(timerFlag == 0)
     {
       RCLCPP_INFO(this->get_logger(), "Timeout already");
+      gpioresetpin();
     }
     else if (timerFlag == 1)
     {
@@ -55,18 +56,42 @@ private:
     timerFlag = 1;
     // cout << "Received a signal just now : " << exectime.toSec() <<"."<< exectime.toNSec() <<endl;
     RCLCPP_INFO(this->get_logger(), "Received: '%d'", msg->signalcommand);
-    if (msg->signalcommand == 1)
+    gpiosetup(msg);
+
+  }
+
+  void gpiosetpin()
+  {
+    // digitalWrite(GPIO_OUTPIN, HIGH);
+    RCLCPP_INFO(this->get_logger(), "LED Pin Set")
+  }
+
+  void gpioresetpin()
+  {
+    // digitalWrite(GPIO_OUTPIN, LOW);
+    RCLCPP_INFO(this->get_logger(), "LED Pin reset")
+  }
+
+  void gpiosetup(const door_sensor_pkg_cpp::msg::Command::SharedPtr msg)
+  {
+    RCLCPP_INFO(this->get_logger(), "Writing %d to GPIO pins", msg->signalcommand);
+    // https://bob.cs.sonoma.edu/IntroCompOrg-RPi/sec-cgpio.html
+    
+    // if(wiringPiSetup() == -1)
+    // {
+    //   RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
+    // }
+    // pinMode(GPIO_OUTPIN, OUTPUT);
+    if(msg->signalcommand == 1)
     {
-      RCLCPP_INFO(this->get_logger(), "Writing %d to GPIO pins", msg->signalcommand);
-      // https://bob.cs.sonoma.edu/IntroCompOrg-RPi/sec-cgpio.html
-        // if(wiringPiSetup() == -1)
-        // {
-        //   RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
-        // }
-        // RCLCPP_INFO(this->get_logger(), "linker LedPin : GPIO %d(wiringPi pin)", GPIO_OUTPIN)
-        // pinMode(GPIO_OUTPIN, OUTPUT);
-        // digitalWrite(LedPin, LOW);
-      cout << "Just done with writing. Waiting for next command : "/* << endtime.toSec() << "." << endtime.toNSec() */<< endl;
+      RCLCPP_INFO(this->get_logger(), "linker LedPin : GPIO %d(wiringPi pin)", GPIO_OUTPIN)
+      gpiosetpin();
+    }
+    else
+    {
+      RCLCPP_INFO(this->get_logger(), "linker LedPin : GPIO %d(wiringPi pin)", GPIO_OUTPIN)
+      gpioresetpin();
+
     }
   }
   rclcpp::Subscription<door_sensor_pkg_cpp::msg::Command>::SharedPtr subscription_;
