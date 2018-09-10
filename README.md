@@ -10,4 +10,4 @@ To run the rmf_agv_subscriber (fetches the command and writes data to the Pi - G
 ```ros2 run door_sensor_pkg_cpp rmf_agv_subscriber```
 
 To read the data from the sensor, 
-```ros2 run door_sensor_pkg_cpp sesnor_status_pub```
+```ros2 run door_sensor_pkg_cpp sensor_status_pub```
