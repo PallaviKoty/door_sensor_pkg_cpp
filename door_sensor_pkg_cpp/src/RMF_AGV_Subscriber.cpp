@@ -11,7 +11,7 @@
 #include <chrono>
 // #include "std_msgs/msg/int8.hpp"
 #include "door_sensor_pkg_cpp/msg/command.hpp"
-// #include <wiringPi.h>
+#include <wiringPi.h>
 using namespace std;
 
 using std::placeholders::_1;
@@ -50,11 +50,10 @@ private:
     }
 
   }
-  // void agv_door_command_topic_callback(const std_msgs::msg::Int8::SharedPtr msg)
+  
   void agv_door_command_topic_callback(const door_sensor_pkg_cpp::msg::Command::SharedPtr msg)
   {
     timerFlag = 1;
-    // cout << "Received a signal just now : " << exectime.toSec() <<"."<< exectime.toNSec() <<endl;
     RCLCPP_INFO(this->get_logger(), "Received: '%d'", msg->signalcommand);
     gpiosetup(msg);
 
@@ -62,13 +61,13 @@ private:
 
   void gpiosetpin()
   {
-    // digitalWrite(GPIO_OUTPIN, HIGH);
+    digitalWrite(GPIO_OUTPIN, HIGH);
     RCLCPP_INFO(this->get_logger(), "LED Pin Set")
   }
 
   void gpioresetpin()
   {
-    // digitalWrite(GPIO_OUTPIN, LOW);
+    digitalWrite(GPIO_OUTPIN, LOW);
     RCLCPP_INFO(this->get_logger(), "LED Pin reset")
   }
 
@@ -77,11 +76,11 @@ private:
     RCLCPP_INFO(this->get_logger(), "Writing %d to GPIO pins", msg->signalcommand);
     // https://bob.cs.sonoma.edu/IntroCompOrg-RPi/sec-cgpio.html
     
-    // if(wiringPiSetup() == -1)
-    // {
-    //   RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
-    // }
-    // pinMode(GPIO_OUTPIN, OUTPUT);
+    if(wiringPiSetup() == -1)
+    {
+      RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
+    }
+    pinMode(GPIO_OUTPIN, OUTPUT);
     if(msg->signalcommand == 1)
     {
       RCLCPP_INFO(this->get_logger(), "linker LedPin : GPIO %d(wiringPi pin)", GPIO_OUTPIN)
