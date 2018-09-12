@@ -6,7 +6,7 @@
 #include <chrono>
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/int8.hpp"
-#include <wiringPi.h>
+// #include <wiringPi.h>
 
 using namespace std::chrono_literals;
 
@@ -21,12 +21,12 @@ public:
   SensorStatusPublisher()
   : Node("sensor_status_pub")
   {
-    if(wiringPiSetup() == -1)
-    {
-      RCLCPP_INFO(this->get_logger(), "setup wiringPi failed");
-    }
-    pinMode(INPUT_PIN, INPUT);
-    pullUpDnControl (INPUT_PIN, PUD_UP) ;
+    // if(wiringPiSetup() == -1)
+    // {
+    //   RCLCPP_INFO(this->get_logger(), "setup wiringPi failed");
+    // }
+    // pinMode(INPUT_PIN, INPUT);
+    // pullUpDnControl (INPUT_PIN, PUD_UP) ;
     status_publisher_ = this->create_publisher<std_msgs::msg::Int8>("sensor_status_topic");
     timer_ = this->create_wall_timer(1000ms, std::bind(&SensorStatusPublisher::timer_callback, this));
   }
@@ -35,17 +35,17 @@ private:
   void timer_callback()
   {
     auto sensor_status = std_msgs::msg::Int8();
-    if(digitalRead(INPUT_PIN) == LOW)
-    {
-      RCLCPP_INFO(this->get_logger(), "Read HIGH, the door is open") //LOW is pushed
-      sensor_status.data = 1;
+    // if(digitalRead(INPUT_PIN) == LOW)
+    // {
+    //   RCLCPP_INFO(this->get_logger(), "Read HIGH, the door is open") //LOW is pushed
+    //   sensor_status.data = 1;
       
-    }
-    else
-    {
-      RCLCPP_INFO(this->get_logger(), "Read LOW, the door is closed") //HIGH is released
-      sensor_status.data = 0;
-    }
+    // }
+    // else
+    // {
+    //   RCLCPP_INFO(this->get_logger(), "Read LOW, the door is closed") //HIGH is released
+    //   sensor_status.data = 0;
+    // }
 
     RCLCPP_INFO(this->get_logger(), "Publishing sensor status: '%d'", sensor_status.data)
     status_publisher_->publish(sensor_status);

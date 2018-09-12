@@ -32,9 +32,9 @@ private:
     auto message = door_sensor_pkg_cpp::msg::Command();
     RCLCPP_INFO(this->get_logger(), "Hey AGV here, I want the door to be opened if I send HIGH");
     cin >> count_;
-    if ((count_!=0) && (count_!=1))
+    if ((count_!=1))
     {
-      RCLCPP_INFO(this->get_logger(), "Bad choice :( Please enter 0 or 1")
+      RCLCPP_INFO(this->get_logger(), "Bad choice :( Please enter 1 to open the door")
       cin >> count_;   
     }
     message.signalcommand = count_;
