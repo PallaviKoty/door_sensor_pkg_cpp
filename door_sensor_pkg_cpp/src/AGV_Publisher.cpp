@@ -20,6 +20,7 @@ public:
   AGVPublisher()
   : Node("agv_publisher"), count_(1)
   {
+    // publisher_ = this->create_publisher<std_msgs::msg::Int8>("agv_door_command_topic");
     publisher_ = this->create_publisher<door_sensor_pkg_cpp::msg::Command>("agv_door_command_topic");
     timer_ = this->create_wall_timer(
       500ms, std::bind(&AGVPublisher::timer_callback, this));
@@ -30,13 +31,14 @@ private:
   {
     // auto message = std_msgs::msg::Int8();
     auto message = door_sensor_pkg_cpp::msg::Command();
-    RCLCPP_INFO(this->get_logger(), "Hey AGV here, I want the door to be opened if I send HIGH");
+    cout << "Hey AGV here, I want the door to be opened if I send HIGH" << endl;
     cin >> count_;
     if ((count_!=1))
     {
-      RCLCPP_INFO(this->get_logger(), "Bad choice :( Please enter 1 to open the door")
+      RCLCPP_INFO(this->get_logger(), "Bad choice : Please enter 1 to open the door")
       cin >> count_;   
     }
+
     message.signalcommand = count_;
     RCLCPP_INFO(this->get_logger(), "Publishing: '%d'", message.signalcommand)
     publisher_->publish(message);

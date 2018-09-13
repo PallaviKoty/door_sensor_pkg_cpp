@@ -54,7 +54,7 @@ private:
 
   void sub_timer_callback()
   {
-    cout << "Count = " <<count<<endl;
+    //cout << "Count = " <<count<<endl;
     if(count < countervalue)
     {
 
@@ -73,7 +73,7 @@ private:
     }
     else 
     {
-      RCLCPP_INFO(this->get_logger(), "Waiting for subscription");
+      //RCLCPP_INFO(this->get_logger(), "Waiting for subscription");
     }
   }
 
