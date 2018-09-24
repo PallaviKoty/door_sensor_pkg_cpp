@@ -1,6 +1,7 @@
 /*
   Created by : Pallavi
   Created on : 28-08-2018
+  Description: This file reads the status of the door from the GPIO pin and publishes it over the ROS2 topic "sensor_status_topic"
 */
 
 #include <chrono>
@@ -21,30 +22,30 @@ public:
   SensorStatusPublisher()
   : Node("sensor_status_pub")
   {
-  if(wiringPiSetup() == -1)
-  {
-    RCLCPP_INFO(this->get_logger(), "setup wiringPi failed");
-  }
-  pinMode(INPUT_PIN, INPUT);
-  pullUpDnControl (INPUT_PIN, PUD_UP) ;
+    if(wiringPiSetup() == -1)
+    {
+      RCLCPP_INFO(this->get_logger(), "setup wiringPi failed");
+    }
+    pinMode(INPUT_PIN, INPUT);
+    pullUpDnControl (INPUT_PIN, PUD_UP) ;
     status_publisher_ = this->create_publisher<std_msgs::msg::Int8>("sensor_status_topic");
-    timer_ = this->create_wall_timer(
-      1000ms, std::bind(&SensorStatusPublisher::timer_callback, this));
+    timer_ = this->create_wall_timer(1000ms, std::bind(&SensorStatusPublisher::timer_callback, this));
   }
 
 private:
+  // This function is called every 1 sec. It reads the door status on the GPIO pins and publishes it over the ROS2 topic
   void timer_callback()
   {
     auto sensor_status = std_msgs::msg::Int8();
     if(digitalRead(INPUT_PIN) == LOW)
     {
-      RCLCPP_INFO(this->get_logger(), "Read HIGH, button is pushed")
+      RCLCPP_INFO(this->get_logger(), "Read HIGH, the door is open") //LOW is pushed
       sensor_status.data = 1;
       
     }
     else
     {
-      RCLCPP_INFO(this->get_logger(), "Read LOW, button is not pushed")
+      RCLCPP_INFO(this->get_logger(), "Read LOW, the door is closed") //HIGH is released
       sensor_status.data = 0;
     }
 
