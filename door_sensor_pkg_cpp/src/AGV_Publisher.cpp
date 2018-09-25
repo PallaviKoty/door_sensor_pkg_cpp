@@ -21,15 +21,15 @@ public:
   AGVPublisher()
   : Node("agv_publisher"),count_(0)
   {
-    // publisher_ = this->create_publisher<std_msgs::msg::Int8>("agv_door_command_topic");
-    publisher_ = this->create_publisher<door_sensor_pkg_cpp::msg::Command>("agv_door_command_topic");
-    timer_ = this->create_wall_timer(
-      1000ms, std::bind(&AGVPublisher::timer_callback, this));
+    // command_publisher_ = this->create_publisher<std_msgs::msg::Int8>("agv_door_command_topic");
+    command_publisher_ = this->create_publisher<door_sensor_pkg_cpp::msg::Command>("door_command_topic");
+    publish_timer_ = this->create_wall_timer(
+      1000ms, std::bind(&AGVPublisher::publish_timer_callback, this));
   }
 
 private:
   // This callback function is called every 1 sec and HIGH is published over "agv_door_command_topic" topic. 
-  void timer_callback()
+  void publish_timer_callback()
   {
     // auto message = std_msgs::msg::Int8();
     auto message = door_sensor_pkg_cpp::msg::Command();
@@ -45,13 +45,13 @@ private:
     {
     message.signalcommand = 1;
     count_++;
-    RCLCPP_INFO(this->get_logger(), "Publishing: '%d'", message.signalcommand)
-    publisher_->publish(message);
+    RCLCPP_INFO(this->get_logger(), "Publishing: '%d', count : '%d'", message.signalcommand, count_)
+    command_publisher_->publish(message);
     }
   }
-  rclcpp::TimerBase::SharedPtr timer_;
-  // rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr publisher_;
-  rclcpp::Publisher<door_sensor_pkg_cpp::msg::Command>::SharedPtr publisher_;
+  rclcpp::TimerBase::SharedPtr publish_timer_;
+  // rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr command_publisher_;
+  rclcpp::Publisher<door_sensor_pkg_cpp::msg::Command>::SharedPtr command_publisher_;
   size_t count_;
 };
 
