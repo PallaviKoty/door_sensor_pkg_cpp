@@ -50,6 +50,8 @@ private:
      RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
     }
     pinMode(GPIO_OUTPIN, OUTPUT);
+    pinMode(INPUT_PIN, INPUT);
+    pullUpDnControl (INPUT_PIN, PUD_UP) ;
   }
 
   // This function is called when there is any message is published over the ROS2 topic
