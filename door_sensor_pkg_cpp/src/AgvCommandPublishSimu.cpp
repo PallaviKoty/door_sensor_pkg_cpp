@@ -15,16 +15,16 @@ using namespace std::chrono_literals;
 /* This creates a subclass of Node and uses std::bind() to register a
  * member function as a callback from the timer. */
 
-class AGVPublisher : public rclcpp::Node
+class AgvCommandPublishSimu : public rclcpp::Node
 {
 public:
-  AGVPublisher()
-  : Node("agv_publisher"),count_(0)
+  AgvCommandPublishSimu()
+  : Node("agv_command_publish_simu"),count_(0)
   {
     // command_publisher_ = this->create_publisher<std_msgs::msg::Int8>("agv_door_command_topic");
     command_publisher_ = this->create_publisher<door_sensor_pkg_cpp::msg::Command>("door_command_topic");
     publish_timer_ = this->create_wall_timer(
-      1000ms, std::bind(&AGVPublisher::publish_timer_callback, this));
+      1000ms, std::bind(&AgvCommandPublishSimu::publish_timer_callback, this));
   }
 
 private:
@@ -58,7 +58,7 @@ private:
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<AGVPublisher>());
+  rclcpp::spin(std::make_shared<AgvCommandPublishSimu>());
   rclcpp::shutdown();
   return 0;
 }

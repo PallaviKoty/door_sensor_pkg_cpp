@@ -8,7 +8,9 @@
 
 DryContactSensorWrap ::DryContactSensorWrap() : Node("dry_contact_sensor_wrap")
 {
+#ifdef WIRINGPI
   gpiosetup();
+#endif
   command_subscription_ = this->create_subscription<door_sensor_pkg_cpp::msg::Command>("door_command_topic", std::bind(&DryContactSensorWrap::door_command_topic_callback, this, _1));
   gpio_write_timer_ = this->create_wall_timer(500ms, std::bind(&DryContactSensorWrap::gpio_write_timer_callback, this));
   door_status_publisher_ = this->create_publisher<std_msgs::msg::Int8>("door_sensor_status_topic");
@@ -54,23 +56,28 @@ void DryContactSensorWrap ::gpio_write_timer_callback()
 void DryContactSensorWrap ::gpiosetup()
 {
   RCLCPP_INFO(this->get_logger(), "setup wiringPi")
-  if(wiringPiSetup() == -1)
+  #ifdef WIRINGPI
+  if (wiringPiSetup() == -1)
   {
-   RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
+    RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
   }
   pinMode(GPIO_OUTPIN, OUTPUT);
   pinMode(INPUT_PIN, INPUT);
-  pullUpDnControl (INPUT_PIN, PUD_UP) ;
+  pullUpDnControl(INPUT_PIN, PUD_UP);
+  #endif
 }
-
 
 // This functions sends a HIGH LOW pulse to the GPIO pin
 void DryContactSensorWrap ::gpiosetpin()
 {
+  #ifdef WIRINGPI
   digitalWrite(GPIO_OUTPIN, HIGH);
+  #endif
   RCLCPP_INFO(this->get_logger(), "LED Pin set")
   std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
-  digitalWrite(GPIO_OUTPIN,LOW);
+  #ifdef WIRINGPI
+  digitalWrite(GPIO_OUTPIN, LOW);
+  #endif
   RCLCPP_INFO(this->get_logger(), "LED Pin reset")
   std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
 }
@@ -78,25 +85,27 @@ void DryContactSensorWrap ::gpiosetpin()
 //This function resets the GPIO pin when nothing is published on the ROS2 topic even after timeout
 void DryContactSensorWrap ::gpioresetpin()
 {
+  #ifdef WIRINGPI
   digitalWrite(GPIO_OUTPIN, LOW);
+  #endif
   RCLCPP_INFO(this->get_logger(), "LED Pin reset")
 }
 
 void DryContactSensorWrap ::status_publish_timer_callback()
 {
   auto door_sensor_status = std_msgs::msg::Int8();
-  if(digitalRead(INPUT_PIN) == LOW)
+  #ifdef WIRINGPI
+  if (digitalRead(INPUT_PIN) == LOW)
   {
     RCLCPP_INFO(this->get_logger(), "The door is open") //LOW is pushed
     door_sensor_status.data = 1;
-
   }
   else
   {
     RCLCPP_INFO(this->get_logger(), "The door is closed") //HIGH is released
     door_sensor_status.data = 0;
   }
-
+  #endif
   RCLCPP_INFO(this->get_logger(), "Publishing sensor status: '%d'", door_sensor_status.data)
   door_status_publisher_->publish(door_sensor_status);
 }

@@ -19,10 +19,19 @@
 #include <unistd.h>
 #include "door_sensor_pkg_cpp/msg/command.hpp"
 #include "std_msgs/msg/int8.hpp"
+
+#ifndef WIRINGPI
+// #define WIRINGPI
+#endif
+
+#ifdef WIRINGPI
 #include <wiringPi.h>
+#endif
+
 using namespace std;
 
 using std::placeholders::_1;
+
 
 #define GPIO_OUTPIN 0
 #define INPUT_PIN 1
