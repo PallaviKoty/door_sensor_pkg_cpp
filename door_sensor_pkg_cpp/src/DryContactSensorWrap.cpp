@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include "door_sensor_pkg_cpp/msg/command.hpp"
 #include "std_msgs/msg/int8.hpp"
-// #include <wiringPi.h>
+#include <wiringPi.h>
 using namespace std;
 
 using std::placeholders::_1;
@@ -45,11 +45,11 @@ private:
   void gpiosetup()
   {
     RCLCPP_INFO(this->get_logger(), "setup wiringPi")
-    // if(wiringPiSetup() == -1)
-    // {
-    //  RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
-    // }
-    // pinMode(GPIO_OUTPIN, OUTPUT);
+    if(wiringPiSetup() == -1)
+    {
+     RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
+    }
+    pinMode(GPIO_OUTPIN, OUTPUT);
   }
 
   // This function is called when there is any message is published over the ROS2 topic
@@ -63,10 +63,10 @@ private:
   // This functions sends a HIGH LOW pulse to the GPIO pin
   void gpiosetpin()
   {
-    // digitalWrite(GPIO_OUTPIN, HIGH);
+    digitalWrite(GPIO_OUTPIN, HIGH);
     RCLCPP_INFO(this->get_logger(), "LED Pin set")
     std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
-    // digitalWrite(GPIO_OUTPIN,LOW);
+    digitalWrite(GPIO_OUTPIN,LOW);
     RCLCPP_INFO(this->get_logger(), "LED Pin reset")
     std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
   }
@@ -74,7 +74,7 @@ private:
   //This function resets the GPIO pin when nothing is published on the ROS2 topic even after timeout
   void gpioresetpin()
   {
-    // digitalWrite(GPIO_OUTPIN, LOW);
+    digitalWrite(GPIO_OUTPIN, LOW);
     RCLCPP_INFO(this->get_logger(), "LED Pin reset")
   }
 
@@ -106,19 +106,19 @@ private:
   void status_publish_timer_callback()
   {
     auto door_sensor_status = std_msgs::msg::Int8();
-    // if(digitalRead(INPUT_PIN) == LOW)
-    // {
-    //   RCLCPP_INFO(this->get_logger(), "The door is open") //LOW is pushed
-    //   door_sensor_status.data = 1;
+    if(digitalRead(INPUT_PIN) == LOW)
+    {
+      RCLCPP_INFO(this->get_logger(), "The door is open") //LOW is pushed
+      door_sensor_status.data = 1;
       
-    // }
-    // else
-    // {
-    //   RCLCPP_INFO(this->get_logger(), "The door is closed") //HIGH is released
-    //   door_sensor_status.data = 0;
-    // }
+    }
+    else
+    {
+      RCLCPP_INFO(this->get_logger(), "The door is closed") //HIGH is released
+      door_sensor_status.data = 0;
+    }
 
-    // RCLCPP_INFO(this->get_logger(), "Publishing sensor status: '%d'", door_sensor_status.data)
+    RCLCPP_INFO(this->get_logger(), "Publishing sensor status: '%d'", door_sensor_status.data)
     door_status_publisher_->publish(door_sensor_status);
   }
 
