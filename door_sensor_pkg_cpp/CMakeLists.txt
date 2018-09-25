@@ -32,22 +32,22 @@ rosidl_generate_interfaces(door_sensor_pkg_cpp
 include_directories(include ${WIRINGPI_INCLUDE_DIRS})
 
 
-add_executable(agv_publisher src/AGV_Publisher.cpp)
-ament_target_dependencies(agv_publisher rclcpp std_msgs ros2_time)
-rosidl_target_interfaces(agv_publisher door_sensor_pkg_cpp "rosidl_typesupport_cpp")
+add_executable(agv_command_publish_simu src/AgvCommandPublishSimu.cpp)
+ament_target_dependencies(agv_command_publish_simu rclcpp std_msgs ros2_time)
+rosidl_target_interfaces(agv_command_publish_simu door_sensor_pkg_cpp "rosidl_typesupport_cpp")
 
 add_executable(dry_contact_sensor_wrap src/DryContactSensorWrap.cpp)
 # ament_target_dependencies(dry_contact_sensor_wrap rclcpp std_msgs ros2_time)
 ament_target_dependencies(dry_contact_sensor_wrap rclcpp std_msgs ros2_time wiringPi)
 rosidl_target_interfaces(dry_contact_sensor_wrap door_sensor_pkg_cpp "rosidl_typesupport_cpp")
 
-add_executable(sensor_status_sub_sim src/sensor_status_sub_sim.cpp)
-ament_target_dependencies(sensor_status_sub_sim rclcpp std_msgs)
+add_executable(status_subscriber_simu src/StatusSubscriberSimu.cpp)
+ament_target_dependencies(status_subscriber_simu rclcpp std_msgs)
 
 install(TARGETS
-  agv_publisher
+  agv_command_publish_simu
   dry_contact_sensor_wrap
-  sensor_status_sub_sim
+  status_subscriber_simu
   DESTINATION lib/${PROJECT_NAME}
 )
 
