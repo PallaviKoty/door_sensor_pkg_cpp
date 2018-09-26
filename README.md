@@ -38,6 +38,11 @@ For compiling the code, use the following command:
 colcon build --symlink-install --packages-select door_sensor_pkg_cpp --cmake-clean-cache
 ```
 
+Source the setup files using the command,
+```
+source install/setup.*
+```
+
 To run the AGV Simulator (publisher of `door open` command):
 ```
 ros2 run door_sensor_pkg_cpp agv_command_publish_simu
