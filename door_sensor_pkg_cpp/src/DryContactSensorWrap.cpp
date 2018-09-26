@@ -23,7 +23,7 @@ DryContactSensorWrap ::~DryContactSensorWrap() {}
 void DryContactSensorWrap ::door_command_topic_callback(const door_sensor_pkg_cpp::msg::Command::SharedPtr msg)
 {
   RCLCPP_INFO(this->get_logger(), "Received: '%d'", msg->signalcommand);
-  timer_flag = 1;
+  timer_flag = true;
   count = 0;
 }
 
@@ -33,9 +33,9 @@ void DryContactSensorWrap ::gpio_write_timer_callback()
   if (count < countervalue)
   {
     //timer_flag is reset whenever any message is published over ROS2 topic
-    if (timer_flag == 1)
+    if (timer_flag)
     {
-      timer_flag = 0;
+      timer_flag = false;
       count = 0;
     }
     gpiosetpin();
@@ -44,6 +44,7 @@ void DryContactSensorWrap ::gpio_write_timer_callback()
   else if (count == countervalue)
   {
     RCLCPP_INFO(this->get_logger(), "Timeout");
+    timeout = true;
     gpioresetpin();
   }
   else
@@ -56,7 +57,7 @@ void DryContactSensorWrap ::gpio_write_timer_callback()
 void DryContactSensorWrap ::gpiosetup()
 {
   RCLCPP_INFO(this->get_logger(), "setup wiringPi")
-  #ifdef WIRINGPI
+#ifdef WIRINGPI
   if (wiringPiSetup() == -1)
   {
     RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
@@ -64,20 +65,20 @@ void DryContactSensorWrap ::gpiosetup()
   pinMode(GPIO_OUTPIN, OUTPUT);
   pinMode(INPUT_PIN, INPUT);
   pullUpDnControl(INPUT_PIN, PUD_UP);
-  #endif
+#endif
 }
 
 // This functions sends a HIGH LOW pulse to the GPIO pin
 void DryContactSensorWrap ::gpiosetpin()
 {
-  #ifdef WIRINGPI
+#ifdef WIRINGPI
   digitalWrite(GPIO_OUTPIN, HIGH);
-  #endif
+#endif
   RCLCPP_INFO(this->get_logger(), "LED Pin set")
   std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
-  #ifdef WIRINGPI
+#ifdef WIRINGPI
   digitalWrite(GPIO_OUTPIN, LOW);
-  #endif
+#endif
   RCLCPP_INFO(this->get_logger(), "LED Pin reset")
   std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
 }
@@ -85,17 +86,17 @@ void DryContactSensorWrap ::gpiosetpin()
 //This function resets the GPIO pin when nothing is published on the ROS2 topic even after timeout
 void DryContactSensorWrap ::gpioresetpin()
 {
-  #ifdef WIRINGPI
+#ifdef WIRINGPI
   digitalWrite(GPIO_OUTPIN, LOW);
-  #endif
+#endif
   RCLCPP_INFO(this->get_logger(), "LED Pin reset")
 }
 
 void DryContactSensorWrap ::status_publish_timer_callback()
 {
   auto door_sensor_status = std_msgs::msg::Int8();
-  #ifdef WIRINGPI
-  if (digitalRead(INPUT_PIN) == LOW)
+#ifdef WIRINGPI
+  if (digitalRead(INPUT_PIN) == LOW && (!timeout))
   {
     RCLCPP_INFO(this->get_logger(), "The door is open") //LOW is pushed
     door_sensor_status.data = 1;
@@ -105,7 +106,7 @@ void DryContactSensorWrap ::status_publish_timer_callback()
     RCLCPP_INFO(this->get_logger(), "The door is closed") //HIGH is released
     door_sensor_status.data = 0;
   }
-  #endif
+#endif
   RCLCPP_INFO(this->get_logger(), "Publishing sensor status: '%d'", door_sensor_status.data)
   door_status_publisher_->publish(door_sensor_status);
 }

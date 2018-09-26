@@ -39,7 +39,7 @@ using std::placeholders::_1;
 class DryContactSensorWrap : public rclcpp::Node
 {
     public:
-        int timer_flag= 0;
+        bool timer_flag= false;
         int timeout_period_sec = 15;
         int half_cycle_period_ms = 200;
         DryContactSensorWrap();
@@ -49,8 +49,11 @@ class DryContactSensorWrap : public rclcpp::Node
         rclcpp::TimerBase::SharedPtr gpio_write_timer_;
         rclcpp::TimerBase::SharedPtr status_publish_timer_;
         rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr door_status_publisher_;
+
+        //Number of times to write to GPIO before timeout
         int countervalue = (timeout_period_sec*1000/2)/half_cycle_period_ms;
         int count = countervalue+1;
+        bool timeout = false;
         //Subscribe to the topic for commands
         void door_command_topic_callback(const door_sensor_pkg_cpp::msg::Command::SharedPtr msg);
         void gpio_write_timer_callback();
