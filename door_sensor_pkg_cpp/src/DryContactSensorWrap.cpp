@@ -96,7 +96,7 @@ void DryContactSensorWrap ::status_publish_timer_callback()
 {
   auto door_sensor_status = std_msgs::msg::Int8();
 #ifdef WIRINGPI
-  if (digitalRead(INPUT_PIN) == LOW && (!timeout))
+  if (digitalRead(INPUT_PIN) == LOW && (!timeout) && (!(count>countervalue)))
   {
     RCLCPP_INFO(this->get_logger(), "The door is open") //LOW is pushed
     door_sensor_status.data = 1;
