@@ -13,9 +13,11 @@ This package offers the following features:
 ### Prerequisites
 
 This package is a ROS2 bouncy package running on Ubuntu. To run this package, you will need the following:
-1. Raspberry Pi 3B+ with Ubuntu/Raspbian installed in it
-2. WiringPi library for Raspberry Pi 3B+
-3. Gertboard (for testing)
+1. Raspberry Pi 3B+
+2. Ubuntu 18.04/Raspbian installed on Raspberry Pi
+3. ROS2 Bouncy Version
+4. WiringPi library for Raspberry Pi 3B+
+5. Gertboard (for testing)
 
 ### Installing
 
