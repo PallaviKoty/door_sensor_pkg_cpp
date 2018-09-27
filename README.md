@@ -8,7 +8,7 @@ The AGV send the `open door` command to the ROS2 wrapper. The wrapper reads the 
 This package offers the following features:
 1. It listens for any `open door` command from the AGV and sends a high low pulse to the GPIO pins on the Pi. 
 2. It reads the status of the door from the GPIO pins and publishes it over the ROS2 topic so that the AGV can subscribe to this topic to know the status of the door.
-`door_sensor_pkg_cpp` has 3 nodes: 2 on the AGV and 1 on the SoC (Raspberry Pi). Here, the `agv_command_publish_simu` and `status_subscriber_simu` nodes are on the AGV while `dry_contact_sensor_wrap` are on the Raspberry Pi.
+`door_sensor_pkg_cpp` has 3 nodes: 2 on the AGV and 1 on the SoC (Raspberry Pi). Here, the `agv_command_publish_simu` and `status_subscriber_simu` nodes are on the AGV while `dry_contact_sensor_wrap` are on the Raspberry Pi. The client need to refer `client` as reference to make use of `dry_contact_sensor_wrap`.
 
 ### Prerequisites
 
@@ -52,9 +52,11 @@ The `dry_contact_sensor_wrap` file does the following:
 1. Fetches the command from the AGV and writes data to the Pi - GPIO pin 17
 2. Reads the status of the door from the GPIO pin and publishes it to the AGV 
 
-To run the `dry_contact_sensor_wrap`,
+This wrap is used in `client.cpp` file.
+
+To run the `client`,
 ```
-ros2 run door_sensor_pkg_cpp dry_contact_sensor_wrap
+ros2 run door_sensor_pkg_cpp client
 ```
 
 To run the AGV Status subscriber, 
