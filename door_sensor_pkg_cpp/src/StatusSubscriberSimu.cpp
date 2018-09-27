@@ -15,7 +15,7 @@ public:
   StatusSubscriberSimu()
   : Node("status_subscriber_simu")
   {
-    subscription_ = this->create_subscription<std_msgs::msg::Int8>("sensor_status_topic", std::bind(&StatusSubscriberSimu::sensor_status_sub_topic_callback, this, _1));
+    subscription_ = this->create_subscription<std_msgs::msg::Int8>("door_sensor_status_topic", std::bind(&StatusSubscriberSimu::sensor_status_sub_topic_callback, this, _1));
   }
 
 private:
