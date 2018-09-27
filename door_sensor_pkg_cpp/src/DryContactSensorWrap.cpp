@@ -4,7 +4,7 @@
   Description: This file subscribes to the ROS2 topic and if there is an open door command over the topic, it sets the GPIO pin on the Pi
 */
 
-#include "DryContactSensorWrap.hpp"
+#include "door_sensor_pkg_cpp/DryContactSensorWrap.hpp"
 
 DryContactSensorWrap ::DryContactSensorWrap() : Node("dry_contact_sensor_wrap")
 {
@@ -111,10 +111,10 @@ void DryContactSensorWrap ::status_publish_timer_callback()
   door_status_publisher_->publish(door_sensor_status);
 }
 
-int main(int argc, char *argv[])
+void call_door_contact_sensor_wrap(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<DryContactSensorWrap>());
   rclcpp::shutdown();
-  return 0;
 }
+
