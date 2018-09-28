@@ -58,7 +58,7 @@ This wrap is used in `client.cpp` file.
 
 To run the `client`,
 ```
-ros2 run door_sensor_pkg_cpp client
+ros2 run door_sensor_pkg_cpp client __params:=src/door_sensor_pkg_cpp/params/parameters.yaml
 ```
 
 To run the AGV Status subscriber, 
