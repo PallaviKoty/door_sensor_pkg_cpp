@@ -31,7 +31,7 @@ private:
     {
       RCLCPP_INFO(this->get_logger(), "Door is closed");
     }
-   }
+  }
   rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr subscription_;
 };
 

@@ -17,6 +17,43 @@ DryContactSensorWrap ::DryContactSensorWrap() : Node("dry_contact_sensor_wrap")
   status_publish_timer_ = this->create_wall_timer(1000ms, std::bind(&DryContactSensorWrap::status_publish_timer_callback, this));
 }
 
+
+void DryContactSensorWrap :: param_initialize()
+{
+  // auto parameters_list = std::make_shared<rclcpp::SyncParametersClient>(this->shared_from_this());
+  // auto parameters_list = std::make_shared<rclcpp::AsyncParametersClient>(this);
+  // std::chrono::seconds sec(1);
+  // while (!parameters_list->wait_for_service(sec))
+  // {
+  //   if (!rclcpp::ok())
+  //   {
+  //     RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service")
+  //   }
+  //   RCLCPP_INFO(this->get_logger(), "service not available, waiting again...")
+  // }
+
+  auto timer_flag_par = rclcpp::Parameter("timer_flag_param", false);
+  this->get_parameter("timer_flag_param", timer_flag_par);
+  timer_flag = timer_flag_par.as_bool();
+
+  auto timeout_period_sec_par = rclcpp::Parameter("timeout_period_sec_param", 0);
+  this->get_parameter("timeout_period_sec_param", timeout_period_sec_par);
+  timeout_period_sec = timeout_period_sec_par.as_int();
+
+  auto half_cycle_period_ms_par = rclcpp::Parameter("half_cycle_period_ms_param", 0);
+  this->get_parameter("half_cycle_period_ms_param", half_cycle_period_ms_par);
+  half_cycle_period_ms = half_cycle_period_ms_par.as_int();  
+  
+  // timer_flag = parameters_list->get_parameters("timer_flag_param", false);
+  // timeout_period_sec = parameters_list->get_parameters("timeout_period_sec_param", 0);
+  // half_cycle_period_ms = parameters_list->get_parameters("timeout_period_sec_param", 0);
+  countervalue = (timeout_period_sec * 1000 / 2) / half_cycle_period_ms;
+  count = countervalue + 1;
+  RCLCPP_INFO(this->get_logger(), "countervalue = %d", countervalue);
+  RCLCPP_INFO(this->get_logger(), "count = %d", count);
+  
+}
+
 DryContactSensorWrap ::~DryContactSensorWrap() {}
 
 // This function is called when there is any message is published over the ROS2 topic
@@ -30,6 +67,8 @@ void DryContactSensorWrap ::door_command_topic_callback(const door_sensor_pkg_cp
 //This function is called every 500ms which checks for timeout and sets/resets the GPIO pins
 void DryContactSensorWrap ::gpio_write_timer_callback()
 {
+  RCLCPP_INFO(this->get_logger(), "countervalue = %d", countervalue);
+  RCLCPP_INFO(this->get_logger(), "count = %d", count);
   if (count < countervalue)
   {
     //timer_flag is reset whenever any message is published over ROS2 topic
@@ -96,7 +135,7 @@ void DryContactSensorWrap ::status_publish_timer_callback()
 {
   auto door_sensor_status = std_msgs::msg::Int8();
 #ifdef WIRINGPI
-  if (digitalRead(INPUT_PIN) == LOW && (!timeout) && (!(count>countervalue)))
+  if (digitalRead(INPUT_PIN) == LOW && (!timeout) && (!(count > countervalue)))
   {
     RCLCPP_INFO(this->get_logger(), "The door is open") //LOW is pushed
     door_sensor_status.data = 1;
@@ -111,10 +150,13 @@ void DryContactSensorWrap ::status_publish_timer_callback()
   door_status_publisher_->publish(door_sensor_status);
 }
 
+
+
 void call_door_contact_sensor_wrap(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<DryContactSensorWrap>());
+  auto node = std::make_shared<DryContactSensorWrap>();
+  node->param_initialize();
+  rclcpp::spin(node);
   rclcpp::shutdown();
 }
-

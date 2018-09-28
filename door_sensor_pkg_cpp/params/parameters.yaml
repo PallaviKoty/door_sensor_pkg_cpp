@@ -1,0 +1,5 @@
+dry_contact_sensor_wrap:
+  ros__parameters:
+    timer_flag_param: false
+    timeout_period_sec_param: 15
+    half_cycle_period_ms_param: 200
