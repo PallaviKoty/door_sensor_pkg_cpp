@@ -20,18 +20,6 @@ DryContactSensorWrap ::DryContactSensorWrap() : Node("dry_contact_sensor_wrap")
 
 void DryContactSensorWrap :: param_initialize()
 {
-  // auto parameters_list = std::make_shared<rclcpp::SyncParametersClient>(this->shared_from_this());
-  // auto parameters_list = std::make_shared<rclcpp::AsyncParametersClient>(this);
-  // std::chrono::seconds sec(1);
-  // while (!parameters_list->wait_for_service(sec))
-  // {
-  //   if (!rclcpp::ok())
-  //   {
-  //     RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service")
-  //   }
-  //   RCLCPP_INFO(this->get_logger(), "service not available, waiting again...")
-  // }
-
   auto timer_flag_par = rclcpp::Parameter("timer_flag_param", false);
   this->get_parameter("timer_flag_param", timer_flag_par);
   timer_flag = timer_flag_par.as_bool();
@@ -44,14 +32,10 @@ void DryContactSensorWrap :: param_initialize()
   this->get_parameter("half_cycle_period_ms_param", half_cycle_period_ms_par);
   half_cycle_period_ms = half_cycle_period_ms_par.as_int();  
   
-  // timer_flag = parameters_list->get_parameters("timer_flag_param", false);
-  // timeout_period_sec = parameters_list->get_parameters("timeout_period_sec_param", 0);
-  // half_cycle_period_ms = parameters_list->get_parameters("timeout_period_sec_param", 0);
   countervalue = (timeout_period_sec * 1000 / 2) / half_cycle_period_ms;
   count = countervalue + 1;
   RCLCPP_INFO(this->get_logger(), "countervalue = %d", countervalue);
   RCLCPP_INFO(this->get_logger(), "count = %d", count);
-  
 }
 
 DryContactSensorWrap ::~DryContactSensorWrap() {}
@@ -149,8 +133,6 @@ void DryContactSensorWrap ::status_publish_timer_callback()
   RCLCPP_INFO(this->get_logger(), "Publishing sensor status: '%d'", door_sensor_status.data)
   door_status_publisher_->publish(door_sensor_status);
 }
-
-
 
 void call_door_contact_sensor_wrap(int argc, char *argv[])
 {
