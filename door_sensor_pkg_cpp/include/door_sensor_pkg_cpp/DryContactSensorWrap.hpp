@@ -39,35 +39,41 @@ using std::placeholders::_1;
 
 class DryContactSensorWrap : public rclcpp::Node
 {
-  public:
-    DryContactSensorWrap();
-    void param_initialize();
-    virtual ~DryContactSensorWrap();
+public:
+  DryContactSensorWrap();
+  void param_initialize();
+  virtual ~DryContactSensorWrap();
 
-  private:
-    bool timer_flag = false;
-    int timeout_period_sec = 0;
-    int half_cycle_period_ms = 0;
-    int count, countervalue = 0;
-    bool timeout = false;
-    rclcpp::Subscription<door_sensor_pkg_cpp::msg::Command>::SharedPtr command_subscription_;
-    rclcpp::TimerBase::SharedPtr gpio_write_timer_;
-    rclcpp::TimerBase::SharedPtr status_publish_timer_;
-    rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr door_status_publisher_;
-  
-    //Subscribe to the topic for commands
-    void door_command_topic_callback(const door_sensor_pkg_cpp::msg::Command::SharedPtr msg);
-    void gpio_write_timer_callback();
+private:
+  bool timer_flag, timeout = false;
+  int timeout_period_sec, half_cycle_period_ms;
+  int count, countervalue = 0;
+  rclcpp::Subscription<door_sensor_pkg_cpp::msg::Command>::SharedPtr command_subscription_;
+  rclcpp::TimerBase::SharedPtr gpio_write_timer_;
+  rclcpp::TimerBase::SharedPtr status_publish_timer_;
+  rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr door_status_publisher_;
 
-    //WiringPi Libraries
-    void gpiosetup();
-    void gpiosetpin();
-    void gpioresetpin();
+  //Subscribe to the topic for commands
+  void door_command_topic_callback(const door_sensor_pkg_cpp::msg::Command::SharedPtr msg);
+  void gpio_write_timer_callback();
 
-    //Publish door status to the AGV
-    void status_publish_timer_callback();
+  //WiringPi Libraries
+  void gpiosetup();
+  void gpiosetpin();
+  void gpioresetpin();
+
+  //Publish door status to the AGV
+  void status_publish_timer_callback();
+
+  template <class T>
+  rclcpp::Parameter get_param(rclcpp::Node *node, std::string param_name, T default_value)
+  {
+    auto param = rclcpp::Parameter(param_name, default_value);
+    node->get_parameter(param_name, param);
+    return param;
+  }
 };
 
-void call_door_contact_sensor_wrap(int argc, char *argv[]);
+void call_door_dry_contact_sensor_wrap(int argc, char *argv[]);
 
 #endif

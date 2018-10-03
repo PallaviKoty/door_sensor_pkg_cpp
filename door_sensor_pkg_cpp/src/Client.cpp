@@ -9,6 +9,6 @@
 
 int main(int argc, char *argv[])
 {
-  call_door_contact_sensor_wrap(argc, argv);
+  call_door_dry_contact_sensor_wrap(argc, argv);
   return 0;
 }

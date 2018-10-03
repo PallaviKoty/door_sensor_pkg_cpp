@@ -20,22 +20,12 @@ DryContactSensorWrap ::DryContactSensorWrap() : Node("dry_contact_sensor_wrap")
 
 void DryContactSensorWrap :: param_initialize()
 {
-  auto timer_flag_par = rclcpp::Parameter("timer_flag_param", false);
-  this->get_parameter("timer_flag_param", timer_flag_par);
-  timer_flag = timer_flag_par.as_bool();
-
-  auto timeout_period_sec_par = rclcpp::Parameter("timeout_period_sec_param", 0);
-  this->get_parameter("timeout_period_sec_param", timeout_period_sec_par);
-  timeout_period_sec = timeout_period_sec_par.as_int();
-
-  auto half_cycle_period_ms_par = rclcpp::Parameter("half_cycle_period_ms_param", 0);
-  this->get_parameter("half_cycle_period_ms_param", half_cycle_period_ms_par);
-  half_cycle_period_ms = half_cycle_period_ms_par.as_int();  
+  timer_flag = get_param(this, "timer_flag_param", false).as_bool();
+  timeout_period_sec = get_param(this, "timeout_period_sec_param", 0).as_int();
+  half_cycle_period_ms = get_param(this, "half_cycle_period_ms_param", 0).as_int(); 
   
   countervalue = (timeout_period_sec * 1000 / 2) / half_cycle_period_ms;
   count = countervalue + 1;
-  RCLCPP_INFO(this->get_logger(), "countervalue = %d", countervalue);
-  RCLCPP_INFO(this->get_logger(), "count = %d", count);
 }
 
 DryContactSensorWrap ::~DryContactSensorWrap() {}
@@ -134,7 +124,7 @@ void DryContactSensorWrap ::status_publish_timer_callback()
   door_status_publisher_->publish(door_sensor_status);
 }
 
-void call_door_contact_sensor_wrap(int argc, char *argv[])
+void call_door_dry_contact_sensor_wrap(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<DryContactSensorWrap>();
