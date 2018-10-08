@@ -1,5 +1,5 @@
 
-# Dry Contact Sensor ROS2 wrapper (Assa Abloy Door Sensor)
+# Dry Contact Door Sensor ROS2 wrapper (Assa Abloy Door Sensor)
 
 The AGV send the `open door` command to the ROS2 wrapper. The wrapper reads the command from the AGV and manipulates the GPIO pins on the Raspberry Pi (The Pi actuates the actions on dry contact sensor which closes/opens the door)
 
