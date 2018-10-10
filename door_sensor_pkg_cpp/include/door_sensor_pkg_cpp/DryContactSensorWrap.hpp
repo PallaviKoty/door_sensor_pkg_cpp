@@ -8,17 +8,8 @@
 #define DRYCONTACTSENSORWRAP_HPP
 
 #include <iostream>
-#include <stdio.h>
-#include <stdbool.h>
-#include <math.h>
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/timer.hpp"
-#include "rclcpp/executor.hpp"
-#include <sstream>
-#include <memory>
-#include <chrono>
-#include <thread>
-#include <unistd.h>
 #include "door_sensor_pkg_cpp/msg/command.hpp"
 #include "std_msgs/msg/int8.hpp"
 
@@ -65,6 +56,7 @@ private:
   //Publish door status to the AGV
   void status_publish_timer_callback();
 
+  //Template to fetch parameters from the parameters.yaml file
   template <class T>
   rclcpp::Parameter get_param(rclcpp::Node *node, std::string param_name, T default_value)
   {
