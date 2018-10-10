@@ -51,11 +51,11 @@ private:
   //Publish door status to the AGV
   void status_publish_timer_callback();
 
-  bool timer_flag;
-  bool timeout = false;
-  int timeout_period_sec;
-  int half_cycle_period_ms;
-  int count, countervalue = 0;
+  bool timer_flag_;
+  bool timeout_ = false;
+  int timeout_period_sec_;
+  int half_cycle_period_ms_;
+  int count_, countervalue_ = 0;
 };
 
 void call_door_dry_contact_sensor_wrap(int argc, char *argv[]);

@@ -22,12 +22,12 @@ DryContactSensorWrap::DryContactSensorWrap() : Node("dry_contact_sensor_wrap")
 
 void DryContactSensorWrap::param_initialize()
 {
-  this->get_parameter_or("timer_flag_param", timer_flag, false);
-  this->get_parameter_or("timeout_period_sec_param", timeout_period_sec, 0);
-  this->get_parameter_or("half_cycle_period_ms_param", half_cycle_period_ms, 0);
+  this->get_parameter_or("timer_flag_param", timer_flag_, false);
+  this->get_parameter_or("timeout_period_sec_param", timeout_period_sec_, 0);
+  this->get_parameter_or("half_cycle_period_ms_param", half_cycle_period_ms_, 0);
  
-  countervalue = (timeout_period_sec * 500) / half_cycle_period_ms;
-  count = countervalue + 1;
+  countervalue_ = (timeout_period_sec_ * 500) / half_cycle_period_ms_;
+  count_ = countervalue_ + 1;
 }
 
 DryContactSensorWrap::~DryContactSensorWrap() {}
@@ -36,30 +36,30 @@ DryContactSensorWrap::~DryContactSensorWrap() {}
 void DryContactSensorWrap::door_command_topic_callback(const door_sensor_pkg_cpp::msg::Command::SharedPtr msg)
 {
   RCLCPP_INFO(this->get_logger(), "Received: '%d'", msg->signalcommand);
-  timer_flag = true;
-  count = 0;
+  timer_flag_ = true;
+  count_ = 0;
 }
 
-//This function is called every 500ms which checks for timeout and sets/resets the GPIO pins
+//This function is called every 500ms which checks for timeout_ and sets/resets the GPIO pins
 void DryContactSensorWrap::gpio_write_timer_callback()
 {
-  RCLCPP_INFO(this->get_logger(), "countervalue = %d", countervalue);
-  RCLCPP_INFO(this->get_logger(), "count = %d", count);
-  if (count < countervalue)
+  RCLCPP_INFO(this->get_logger(), "countervalue = %d", countervalue_);
+  RCLCPP_INFO(this->get_logger(), "count = %d", count_);
+  if (count_ < countervalue_)
   {
-    //timer_flag is reset whenever any message is published over ROS2 topic
-    if (timer_flag)
+    //timer_flag_ is reset whenever any message is published over ROS2 topic
+    if (timer_flag_)
     {
-      timer_flag = false;
-      count = 0;
+      timer_flag_ = false;
+      count_ = 0;
     }
     gpiosetpin();
-    count++;
+    count_++;
   }
-  else if (count == countervalue)
+  else if (count_ == countervalue_)
   {
-    RCLCPP_INFO(this->get_logger(), "Timeout");
-    timeout = true;
+    RCLCPP_INFO(this->get_logger(), "timeout");
+    timeout_ = true;
     gpioresetpin();
   }
   else
@@ -90,12 +90,12 @@ void DryContactSensorWrap::gpiosetpin()
   digitalWrite(GPIO_OUTPIN, HIGH);
 #endif
   RCLCPP_INFO(this->get_logger(), "LED Pin set");
-  std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
+  std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms_));
 #ifdef WIRINGPI
   digitalWrite(GPIO_OUTPIN, LOW);
 #endif
   RCLCPP_INFO(this->get_logger(), "LED Pin reset");
-  std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
+  std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms_));
 }
 
 //This function resets the GPIO pin when nothing is published on the ROS2 topic even after timeout
@@ -111,7 +111,7 @@ void DryContactSensorWrap::status_publish_timer_callback()
 {
   auto door_sensor_status = std_msgs::msg::Int8();
 #ifdef WIRINGPI
-  if (digitalRead(INPUT_PIN) == LOW && (!timeout) && (!(count > countervalue)))
+  if (digitalRead(INPUT_PIN) == LOW && (!timeout_) && (!(count_ > countervalue_)))
   {
     RCLCPP_INFO(this->get_logger(), "The door is open"); //LOW is pushed
     door_sensor_status.data = 1;
