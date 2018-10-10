@@ -18,10 +18,8 @@
 #endif
 
 #ifdef WIRINGPI
-#include <wiringPi.h>
+include <wiringPi.h>
 #endif
-
-using namespace std;
 
 using std::placeholders::_1;
 
@@ -32,13 +30,10 @@ class DryContactSensorWrap : public rclcpp::Node
 {
 public:
   DryContactSensorWrap();
-  void param_initialize();
   virtual ~DryContactSensorWrap();
+  void param_initialize();
 
 private:
-  bool timer_flag, timeout = false;
-  int timeout_period_sec, half_cycle_period_ms;
-  int count, countervalue = 0;
   rclcpp::Subscription<door_sensor_pkg_cpp::msg::Command>::SharedPtr command_subscription_;
   rclcpp::TimerBase::SharedPtr gpio_write_timer_;
   rclcpp::TimerBase::SharedPtr status_publish_timer_;
@@ -56,14 +51,11 @@ private:
   //Publish door status to the AGV
   void status_publish_timer_callback();
 
-  //Template to fetch parameters from the parameters.yaml file
-  template <class T>
-  rclcpp::Parameter get_param(rclcpp::Node *node, std::string param_name, T default_value)
-  {
-    auto param = rclcpp::Parameter(param_name, default_value);
-    node->get_parameter(param_name, param);
-    return param;
-  }
+  bool timer_flag;
+  bool timeout = false;
+  int timeout_period_sec;
+  int half_cycle_period_ms;
+  int count, countervalue = 0;
 };
 
 void call_door_dry_contact_sensor_wrap(int argc, char *argv[]);

@@ -19,16 +19,16 @@ class AgvCommandPublishSimu : public rclcpp::Node
 {
 public:
   AgvCommandPublishSimu()
-  : Node("agv_command_publish_simu"),count_(0)
+      : Node("agv_command_publish_simu"), count_(0)
   {
     // command_publisher_ = this->create_publisher<std_msgs::msg::Int8>("agv_door_command_topic");
     command_publisher_ = this->create_publisher<door_sensor_pkg_cpp::msg::Command>("door_command_topic");
     publish_timer_ = this->create_wall_timer(
-      1000ms, std::bind(&AgvCommandPublishSimu::publish_timer_callback, this));
+        1000ms, std::bind(&AgvCommandPublishSimu::publish_timer_callback, this));
   }
 
 private:
-  // This callback function is called every 1 sec and HIGH is published over "agv_door_command_topic" topic. 
+  // This callback function is called every 1 sec and HIGH is published over "agv_door_command_topic" topic.
   void publish_timer_callback()
   {
     // auto message = std_msgs::msg::Int8();
@@ -38,15 +38,18 @@ private:
     // if ((count_!=1))
     // {
     //   RCLCPP_INFO(this->get_logger(), "Bad choice : Please enter 1 to open the door")
-    //   cin >> count_;   
+    //   cin >> count_;
     // }
-    message.signalcommand = 0;
-    if(count_ < 100)
+    if (count_ < 100)
     {
-    message.signalcommand = 1;
-    count_++;
-    RCLCPP_INFO(this->get_logger(), "Publishing: '%d', count : '%d'", message.signalcommand, count_)
-    command_publisher_->publish(message);
+      message.signalcommand = 1;
+      count_++;
+      RCLCPP_INFO(this->get_logger(), "Publishing: '%d', count : '%d'", message.signalcommand, count_)
+      command_publisher_->publish(message);
+    }
+    else
+    {
+      message.signalcommand = 0;
     }
   }
   rclcpp::TimerBase::SharedPtr publish_timer_;
@@ -55,7 +58,7 @@ private:
   size_t count_;
 };
 
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<AgvCommandPublishSimu>());

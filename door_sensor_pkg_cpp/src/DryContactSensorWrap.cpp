@@ -6,7 +6,9 @@
 
 #include "door_sensor_pkg_cpp/DryContactSensorWrap.hpp"
 
-DryContactSensorWrap ::DryContactSensorWrap() : Node("dry_contact_sensor_wrap")
+using namespace std;
+
+DryContactSensorWrap::DryContactSensorWrap() : Node("dry_contact_sensor_wrap")
 {
 #ifdef WIRINGPI
   gpiosetup();
@@ -18,20 +20,20 @@ DryContactSensorWrap ::DryContactSensorWrap() : Node("dry_contact_sensor_wrap")
 }
 
 
-void DryContactSensorWrap :: param_initialize()
+void DryContactSensorWrap::param_initialize()
 {
-  timer_flag = get_param(this, "timer_flag_param", false).as_bool();
-  timeout_period_sec = get_param(this, "timeout_period_sec_param", 0).as_int();
-  half_cycle_period_ms = get_param(this, "half_cycle_period_ms_param", 0).as_int(); 
-  
-  countervalue = (timeout_period_sec * 1000 / 2) / half_cycle_period_ms;
+  this->get_parameter_or("timer_flag_param", timer_flag, false);
+  this->get_parameter_or("timeout_period_sec_param", timeout_period_sec, 0);
+  this->get_parameter_or("half_cycle_period_ms_param", half_cycle_period_ms, 0);
+ 
+  countervalue = (timeout_period_sec * 500) / half_cycle_period_ms;
   count = countervalue + 1;
 }
 
-DryContactSensorWrap ::~DryContactSensorWrap() {}
+DryContactSensorWrap::~DryContactSensorWrap() {}
 
 // This function is called when there is any message is published over the ROS2 topic
-void DryContactSensorWrap ::door_command_topic_callback(const door_sensor_pkg_cpp::msg::Command::SharedPtr msg)
+void DryContactSensorWrap::door_command_topic_callback(const door_sensor_pkg_cpp::msg::Command::SharedPtr msg)
 {
   RCLCPP_INFO(this->get_logger(), "Received: '%d'", msg->signalcommand);
   timer_flag = true;
@@ -39,7 +41,7 @@ void DryContactSensorWrap ::door_command_topic_callback(const door_sensor_pkg_cp
 }
 
 //This function is called every 500ms which checks for timeout and sets/resets the GPIO pins
-void DryContactSensorWrap ::gpio_write_timer_callback()
+void DryContactSensorWrap::gpio_write_timer_callback()
 {
   RCLCPP_INFO(this->get_logger(), "countervalue = %d", countervalue);
   RCLCPP_INFO(this->get_logger(), "count = %d", count);
@@ -67,13 +69,13 @@ void DryContactSensorWrap ::gpio_write_timer_callback()
 }
 
 // Initial wiring setup needs to done before using wiringPi functions/APIs
-void DryContactSensorWrap ::gpiosetup()
+void DryContactSensorWrap::gpiosetup()
 {
-  RCLCPP_INFO(this->get_logger(), "setup wiringPi")
+  RCLCPP_INFO(this->get_logger(), "setup wiringPi");
 #ifdef WIRINGPI
   if (wiringPiSetup() == -1)
   {
-    RCLCPP_INFO(this->get_logger(), "setup wiringPi failed")
+    RCLCPP_INFO(this->get_logger(), "setup wiringPi failed");
   }
   pinMode(GPIO_OUTPIN, OUTPUT);
   pinMode(INPUT_PIN, INPUT);
@@ -82,45 +84,45 @@ void DryContactSensorWrap ::gpiosetup()
 }
 
 // This functions sends a HIGH LOW pulse to the GPIO pin
-void DryContactSensorWrap ::gpiosetpin()
+void DryContactSensorWrap::gpiosetpin()
 {
 #ifdef WIRINGPI
   digitalWrite(GPIO_OUTPIN, HIGH);
 #endif
-  RCLCPP_INFO(this->get_logger(), "LED Pin set")
+  RCLCPP_INFO(this->get_logger(), "LED Pin set");
   std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
 #ifdef WIRINGPI
   digitalWrite(GPIO_OUTPIN, LOW);
 #endif
-  RCLCPP_INFO(this->get_logger(), "LED Pin reset")
+  RCLCPP_INFO(this->get_logger(), "LED Pin reset");
   std::this_thread::sleep_for(std::chrono::milliseconds(half_cycle_period_ms));
 }
 
 //This function resets the GPIO pin when nothing is published on the ROS2 topic even after timeout
-void DryContactSensorWrap ::gpioresetpin()
+void DryContactSensorWrap::gpioresetpin()
 {
 #ifdef WIRINGPI
   digitalWrite(GPIO_OUTPIN, LOW);
 #endif
-  RCLCPP_INFO(this->get_logger(), "LED Pin reset")
+  RCLCPP_INFO(this->get_logger(), "LED Pin reset");
 }
 
-void DryContactSensorWrap ::status_publish_timer_callback()
+void DryContactSensorWrap::status_publish_timer_callback()
 {
   auto door_sensor_status = std_msgs::msg::Int8();
 #ifdef WIRINGPI
   if (digitalRead(INPUT_PIN) == LOW && (!timeout) && (!(count > countervalue)))
   {
-    RCLCPP_INFO(this->get_logger(), "The door is open") //LOW is pushed
+    RCLCPP_INFO(this->get_logger(), "The door is open"); //LOW is pushed
     door_sensor_status.data = 1;
   }
   else
   {
-    RCLCPP_INFO(this->get_logger(), "The door is closed") //HIGH is released
+    RCLCPP_INFO(this->get_logger(), "The door is closed"); //HIGH is released
     door_sensor_status.data = 0;
   }
 #endif
-  RCLCPP_INFO(this->get_logger(), "Publishing sensor status: '%d'", door_sensor_status.data)
+  RCLCPP_INFO(this->get_logger(), "Publishing sensor status: '%d'", door_sensor_status.data);
   door_status_publisher_->publish(door_sensor_status);
 }
 
