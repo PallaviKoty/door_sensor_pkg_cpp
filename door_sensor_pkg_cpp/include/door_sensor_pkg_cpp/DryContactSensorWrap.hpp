@@ -14,11 +14,11 @@
 #include "std_msgs/msg/int8.hpp"
 
 #ifndef WIRINGPI
-// #define WIRINGPI
+#define WIRINGPI
 #endif
 
 #ifdef WIRINGPI
-include <wiringPi.h>
+#include <wiringPi.h>
 #endif
 
 using std::placeholders::_1;
